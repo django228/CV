@@ -1,24 +1,29 @@
-name: Build PDF
+name: "Render"
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
-  build_pdf:
+  render:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Compile LaTeX to PDF
+      - uses: actions/checkout@v2
+      - name: Compile cv.tex
         uses: xu-cheng/latex-action@v3
         with:
           root_file: cv.tex
-          # Optional: Add compiler arguments if needed
-          args: "-shell-escape -interaction=nonstopmode -file-line-error"
-
-      - name: Upload PDF artifact
+      - name: Upload PDF as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CV.pdf
+          name: PDF
           path: cv.pdf
+      - name: Commit rendered CV
+        run: |
+          git config --global user.name 'github-actions bot'
+          git config --global user.email 'kuzznya@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git add cv.pdf
+          git commit -m "Publish rendered CV"
+          git push
