@@ -10,20 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      # LaTeX compilation
       - name: Compile cv.tex
         uses: xu-cheng/latex-action@v3
         with:
           root_file: cv.tex
-      - name: Upload PDF as an artifact
-        uses: actions/upload-artifact@v4
+
+      # Jekyll site build (added)
+      - name: Build Jekyll site
+        uses: actions/jekyll-build-pages@v1
         with:
-          name: PDF
-          path: cv.pdf
-      - name: Commit rendered CV
+          source: ./  # or ./docs if using docs folder
+          destination: ./_site
+
+      # Commit both PDF and built site
+      - name: Commit rendered files
         run: |
           git config --global user.name 'github-actions bot'
           git config --global user.email 'django228@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add cv.pdf
-          git commit -m "Publish rendered CV"
+          git add _site  # if you want to commit the built site
+          git commit -m "Publish rendered files"
           git push
