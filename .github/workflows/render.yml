@@ -1,10 +1,9 @@
-name: "Render"
+name: Build PDF
 
 on:
   push:
-    branches:
-      - master
-      
+    branches: [ master ]
+
 jobs:
   build_pdf:
     runs-on: ubuntu-latest
@@ -15,6 +14,7 @@ jobs:
         uses: xu-cheng/latex-action@v3
         with:
           root_file: cv.tex
+          # Optional: Add compiler arguments if needed
           args: "-shell-escape -interaction=nonstopmode -file-line-error"
 
       - name: Upload PDF artifact
